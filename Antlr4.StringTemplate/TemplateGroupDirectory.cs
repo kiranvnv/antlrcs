@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD license"]
  * Copyright (c) 2011 Terence Parr
  * All rights reserved.
@@ -160,7 +160,7 @@ namespace Antlr4.StringTemplate
             if (!Path.IsPathRooted(parent))
                 throw new ArgumentException();
 
-            Uri groupFileURL = null;
+            Uri groupFileURL;
             try
             {
                 // see if parent of template name is a group file
@@ -220,7 +220,7 @@ namespace Antlr4.StringTemplate
                 Console.WriteLine("loadTemplateFile({0}) in groupdir from {1} prefix={2}", unqualifiedFileName, root, prefix);
 
             string templateName = Path.ChangeExtension(unqualifiedFileName, null);
-            Uri f = null;
+            Uri f;
             try
             {
                 f = new Uri(root.LocalPath + prefix + unqualifiedFileName);
@@ -234,7 +234,7 @@ namespace Antlr4.StringTemplate
             ANTLRReaderStream fs = null;
             try
             {
-                fs = new ANTLRReaderStream(new StreamReader(f.LocalPath, Encoding));
+                fs = new ANTLRReaderStream(new StreamReader(File.OpenRead(f.LocalPath), Encoding));
                 fs.name = unqualifiedFileName;
             }
             catch (IOException)

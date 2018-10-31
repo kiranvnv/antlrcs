@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -207,6 +207,7 @@ namespace AntlrUnitTests
         }
 
         [TestMethod][TestCategory(TestCategories.Antlr3)]
+        [TestCategory(TestCategories.SkipOnCI)]
         public void TestTokenInTokensSectionAndTokenRuleDef() /*throws Exception*/ {
             // this must return A not I to the parser; calling a nonfragment rule
             // from a nonfragment rule does not set the overall token.
@@ -223,6 +224,7 @@ namespace AntlrUnitTests
         }
 
         [TestMethod][TestCategory(TestCategories.Antlr3)]
+        [TestCategory(TestCategories.SkipOnCI)]
         public void TestTokenInTokensSectionAndTokenRuleDef2() /*throws Exception*/ {
             // this must return A not I to the parser; calling a nonfragment rule
             // from a nonfragment rule does not set the overall token.

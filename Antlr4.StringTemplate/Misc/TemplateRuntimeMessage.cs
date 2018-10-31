@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD license"]
  * Copyright (c) 2011 Terence Parr
  * All rights reserved.
@@ -64,14 +64,14 @@ namespace Antlr4.StringTemplate.Misc
         }
 
         public TemplateRuntimeMessage(ErrorType error, int ip, TemplateFrame frame, Exception e, object arg, object arg2)
-            : base(error, frame.Template, e, arg, arg2)
+            : base(error, frame?.Template, e, arg, arg2)
         {
             this.ip = ip;
             this._frame = frame;
         }
 
         public TemplateRuntimeMessage(ErrorType error, int ip, TemplateFrame frame, Exception e, object arg, object arg2, object arg3)
-            : base(error, frame.Template, e, arg, arg2, arg3)
+            : base(error, frame?.Template, e, arg, arg2, arg3)
         {
             this.ip = ip;
             this._frame = frame;
@@ -114,9 +114,10 @@ namespace Antlr4.StringTemplate.Misc
         public override string ToString()
         {
             StringBuilder buf = new StringBuilder();
-            string loc = GetSourceLocation();
+            string loc = null;
             if (_frame != null)
             {
+                loc = GetSourceLocation();
                 buf.Append("context [");
                 buf.Append(_frame.GetEnclosingInstanceStackString());
                 buf.Append("]");

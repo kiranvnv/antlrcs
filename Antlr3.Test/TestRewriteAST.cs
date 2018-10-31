@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -41,6 +41,7 @@ namespace AntlrUnitTests
     using GrammarSemanticsMessage = Antlr3.Tool.GrammarSemanticsMessage;
 
     [TestClass]
+    [TestCategory(TestCategories.SkipOnCI)]
     public class TestRewriteAST : BaseTest
     {
         protected bool debug = false;

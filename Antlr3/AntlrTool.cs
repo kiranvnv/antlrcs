@@ -35,6 +35,7 @@ namespace Antlr3
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Antlr3.Analysis;
     using Antlr3.Codegen;
     using Antlr3.Misc;
@@ -158,6 +159,17 @@ namespace Antlr3
             }
         }
 
+        public static string AssemblyInformationalVersion
+        {
+            get
+            {
+                var assembly = typeof(AntlrTool).Assembly;
+                var attributes = assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), true);
+                var informationalVersion = attributes.OfType<AssemblyInformationalVersionAttribute>().FirstOrDefault();
+                return informationalVersion?.InformationalVersion ?? AssemblyVersion.ToString(4);
+            }
+        }
+
         public static string ToolPathRoot
         {
             get;
@@ -186,7 +198,7 @@ namespace Antlr3
         {
             if (verbose)
             {
-                ErrorManager.Info("ANTLR Parser Generator  Version " + AssemblyVersion.ToString(4));
+                ErrorManager.Info("ANTLR Parser Generator  Version " + AssemblyInformationalVersion);
                 showBanner = false;
             }
 
@@ -573,7 +585,7 @@ namespace Antlr3
             // before setting options. The banner won't display that way!
             if ( Verbose && showBanner )
             {
-                ErrorManager.Info( "ANTLR Parser Generator  Version " + AssemblyVersion.ToString(4) );
+                ErrorManager.Info( "ANTLR Parser Generator  Version " + AssemblyInformationalVersion );
                 showBanner = false;
             }
 
@@ -933,7 +945,7 @@ namespace Antlr3
 
         private static void Version()
         {
-            ErrorManager.Info( "ANTLR Parser Generator  Version " + AntlrTool.AssemblyVersion.ToString(4) );
+            ErrorManager.Info( "ANTLR Parser Generator  Version " + AntlrTool.AssemblyInformationalVersion );
         }
 
         private static void Help()
@@ -1081,7 +1093,7 @@ namespace Antlr3
         {
             string outputDir = OutputDirectory;
 
-            if ( fileNameWithPath.IndexOfAny( System.IO.Path.GetInvalidPathChars() ) >= 0 )
+            if (IsInvalidFileNameWithPath(fileNameWithPath) )
                 return new System.IO.DirectoryInfo( outputDir );
 
             if ( !System.IO.Path.IsPathRooted( fileNameWithPath ) )
@@ -1144,6 +1156,16 @@ namespace Antlr3
                 outputDir = fileDirectory;
             }
             return new System.IO.DirectoryInfo( outputDir );
+        }
+
+        private static bool IsInvalidFileNameWithPath(string fileNameWithPath)
+        {
+            if (fileNameWithPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                return true;
+
+            // On some platforms, GetInvalidFileNameChars is not simply equal to GetInvalidPathChars plus the directory separators
+            string[] segments = fileNameWithPath.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+            return segments.Any(segment => segment.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0);
         }
 
         /**

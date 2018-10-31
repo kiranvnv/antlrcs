@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -62,15 +62,10 @@ namespace AntlrUnitTests
     using StringTemplateGroup = Antlr4.StringTemplate.TemplateGroup;
 
     [TestClass]
-#if DEBUG
-    [DeploymentItem(@"bin\Debug\Codegen\", "Codegen")]
-    [DeploymentItem(@"bin\Debug\Targets\", "Targets")]
-    [DeploymentItem(@"bin\Debug\Tool\", "Tool")]
-#else
-    [DeploymentItem(@"bin\Release\Codegen\", "Codegen")]
-    [DeploymentItem(@"bin\Release\Targets\", "Targets")]
-    [DeploymentItem(@"bin\Release\Tool\", "Tool")]
-#endif
+    [DeploymentItem(@"Codegen\", "Codegen")]
+    [DeploymentItem(@"Antlr3.Targets.Java.dll", "Targets")]
+    [DeploymentItem(@"Antlr3.Targets.Java.pdb", "Targets")]
+    [DeploymentItem(@"Tool\", "Tool")]
     public abstract class BaseTest
     {
         public readonly string jikes = null;
@@ -116,7 +111,12 @@ namespace AntlrUnitTests
             string configuration = "Release";
 #endif
             System.IO.DirectoryInfo currentAssemblyDirectory = new System.IO.FileInfo(typeof(BaseTest).Assembly.Location).Directory;
-            AntlrTool.ToolPathRoot = Path.Combine(currentAssemblyDirectory.Parent.Parent.Parent.FullName, @"bin\" + configuration);
+
+#if NET45
+            AntlrTool.ToolPathRoot = Path.Combine(currentAssemblyDirectory.Parent.Parent.Parent.FullName, "bin", configuration, "net40-client");
+#else
+            AntlrTool.ToolPathRoot = Path.Combine(currentAssemblyDirectory.Parent.Parent.Parent.Parent.FullName, "bin", configuration, "netstandard2.0");
+#endif
 
             // new output dir for each test
             tmpdir = Path.GetFullPath( Path.Combine( Path.GetTempPath(), "antlr-" + currentTimeMillis() ) );

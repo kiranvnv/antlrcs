@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -36,6 +36,7 @@ namespace AntlrUnitTests
 
     /** Test hetero trees in parsers and tree parsers */
     [TestClass]
+    [TestCategory(TestCategories.SkipOnCI)]
     public class TestHeteroAST : BaseTest
     {
         protected bool debug = false;

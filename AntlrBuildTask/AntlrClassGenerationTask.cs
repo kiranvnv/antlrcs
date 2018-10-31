@@ -30,11 +30,8 @@ namespace Antlr3.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using System.Security;
-    using System.Security.Policy;
     using System.Threading;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -42,11 +39,14 @@ namespace Antlr3.Build.Tasks
     using File = System.IO.File;
     using FileAttributes = System.IO.FileAttributes;
     using Path = System.IO.Path;
+#if !NETSTANDARD
+    using System.Diagnostics;
+#endif
 
     public class AntlrClassGenerationTask
         : Task
     {
-        private static AppDomain _sharedAppDomain;
+        private static readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
 
         private const string DefaultGeneratedSourceExtension = "g";
         private List<ITaskItem> _generatedCodeFiles = new List<ITaskItem>();
@@ -143,26 +143,8 @@ namespace Antlr3.Build.Tasks
             }
         }
 
-        public AppDomain GetAntlrTaskAppDomain()
-        {
-            if (_sharedAppDomain != null)
-                return _sharedAppDomain;
-
-            AppDomainSetup info = new AppDomainSetup
-            {
-                ApplicationBase = BuildTaskPath,
-                LoaderOptimization = LoaderOptimization.MultiDomainHost,
-                ShadowCopyFiles = "true"
-            };
-
-            string friendlyName = "AntlrClassGenerationDomain_" + Guid.NewGuid();
-            _sharedAppDomain = AppDomain.CreateDomain(friendlyName, AppDomain.CurrentDomain.Evidence, info, new NamedPermissionSet("FullTrust"), new StrongName[0]);
-            return _sharedAppDomain;
-        }
-
         public override bool Execute()
         {
-            AppDomain domain = null;
             bool success;
 
             if (!Path.IsPathRooted(AntlrToolPath))
@@ -173,9 +155,17 @@ namespace Antlr3.Build.Tasks
 
             try
             {
-                domain = GetAntlrTaskAppDomain();
-                AntlrClassGenerationTaskInternal wrapper = CreateBuildTaskWrapper(domain);
-                success = wrapper.Execute();
+                AntlrClassGenerationTaskInternal wrapper = CreateBuildTaskWrapper();
+
+                _lock.Wait();
+                try
+                {
+                    success = wrapper.Execute();
+                }
+                finally
+                {
+                    _lock.Release();
+                }
 
                 if (success)
                 {
@@ -194,11 +184,6 @@ namespace Antlr3.Build.Tasks
 
                 ProcessExceptionAsBuildMessage(exception);
                 success = false;
-            }
-            finally
-            {
-                if (domain != null && domain != _sharedAppDomain)
-                    AppDomain.Unload(domain);
             }
 
             return success;
@@ -240,9 +225,9 @@ namespace Antlr3.Build.Tasks
             }
         }
 
-        private AntlrClassGenerationTaskInternal CreateBuildTaskWrapper(AppDomain domain)
+        private AntlrClassGenerationTaskInternal CreateBuildTaskWrapper()
         {
-            AntlrClassGenerationTaskInternal wrapper = (AntlrClassGenerationTaskInternal)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(AntlrClassGenerationTaskInternal).FullName);
+            var wrapper = new AntlrClassGenerationTaskInternal();
 
             IList<string> sourceCodeFiles = null;
             if (this.SourceCodeFiles != null)
@@ -301,9 +286,7 @@ namespace Antlr3.Build.Tasks
         {
             while (exception != null)
             {
-                if ((exception is OutOfMemoryException)
-                    || (exception is InsufficientMemoryException)
-                    || (exception is ThreadAbortException))
+                if (exception is OutOfMemoryException)
                 {
                     return true;
                 }

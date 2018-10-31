@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2011 Terence Parr
  * All rights reserved.
@@ -64,7 +64,9 @@ namespace Antlr4.StringTemplate.Debug
             return "addEvent{" +
                 ", name='" + name + '\'' +
                 ", value=" + value +
+#if !NETSTANDARD
                 ", location=" + GetFileName() + ":" + GetLine() +
+#endif
                 '}';
         }
     }

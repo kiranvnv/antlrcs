@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD license"]
  * Copyright (c) 2011 Terence Parr
  * All rights reserved.
@@ -1271,6 +1271,17 @@ namespace Antlr4.Test.StringTemplate
             Template st2 = new Template(prototype);
             st2.Add("arg1", "value");
             Assert.AreEqual("simple template", st2.Render());
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.ST4)]
+        public void TestFormatPositionalArguments()
+        {
+            string n = "n";
+            string p = "p";
+            string expected = "n:p";
+            string actual = Template.Format("<%1>:<%2>", n, p);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

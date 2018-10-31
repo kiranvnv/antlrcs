@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD license"]
  * Copyright (c) 2011 Terence Parr
  * All rights reserved.
@@ -35,6 +35,7 @@ namespace Antlr4.StringTemplate.Misc
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using Antlr4.StringTemplate.Extensions;
 
     using ArgumentNullException = System.ArgumentNullException;
     using FieldInfo = System.Reflection.FieldInfo;
@@ -56,7 +57,7 @@ namespace Antlr4.StringTemplate.Misc
             if (property == null)
                 throw new TemplateNoSuchPropertyException(o, string.Format("{0}.{1}", c.FullName, propertyName ?? "null"));
 
-            object value = null;
+            object value;
             var accessor = FindMember(c, propertyName);
             if (accessor != null)
             {

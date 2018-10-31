@@ -1,140 +1,82 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="MSBuild.Sdk.Extras">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B5910BE2-DE21-4AA9-95C1-486F42B9E794}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworks>net35-client;net40-client;netstandard2.0</TargetFrameworks>
     <RootNamespace>Antlr.ST</RootNamespace>
-    <AssemblyName>Antlr3.StringTemplate</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\..\keys\antlr\Key.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+
+    <Description>The C# port of StringTemplate 3.</Description>
+    <Version>$(ANTLRVersion)</Version>
+    <FileVersion>$(ANTLRFileVersion)</FileVersion>
+    <InformationalVersion>$(ANTLRInformationalVersion)</InformationalVersion>
+
+    <Title>StringTemplate 3</Title>
+    <PackageId>StringTemplate3</PackageId>
+    <PackageTags>stringtemplate st3 stringtemplate3 template</PackageTags>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;COMPILE_EXPRESSIONS; CACHE_FUNCTORS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Antlr3.StringTemplate.xml</DocumentationFile>
+
+  <Target Name="DisableCrazyPackageDeletion" BeforeTargets="Clean">
+    <PropertyGroup>
+      <GeneratePackageValue>$(GeneratePackageOnBuild)</GeneratePackageValue>
+      <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    </PropertyGroup>
+  </Target>
+  <Target Name="EnablePackageGeneration" Condition="'$(GeneratePackageValue)' != ''" BeforeTargets="Build">
+    <PropertyGroup>
+      <GeneratePackageOnBuild>$(GeneratePackageValue)</GeneratePackageOnBuild>
+    </PropertyGroup>
+  </Target>
+
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <ItemGroup>
+        <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+        <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);COMPILE_EXPRESSIONS;CACHE_FUNCTORS</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;COMPILE_EXPRESSIONS; CACHE_FUNCTORS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Antlr3.StringTemplate.xml</DocumentationFile>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <ProjectReference Include="..\Runtime\Antlr3.Runtime\Antlr3.Runtime.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="AttributeRenderer.cs" />
-    <Compile Include="AutoIndentWriter.cs" />
-    <Compile Include="CommonGroupLoader.cs" />
-    <Compile Include="Extensions\ExceptionExtensions.cs" />
-    <Compile Include="NoIndentWriter.cs" />
-    <Compile Include="PathGroupLoader.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringTemplate.cs" />
-    <Compile Include="StringTemplateErrorListener.cs" />
-    <Compile Include="StringTemplateGroup.cs" />
-    <Compile Include="StringTemplateGroupInterface.cs" />
-    <Compile Include="StringTemplateGroupLoader.cs" />
-    <Compile Include="StringTemplateWriter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Antlr3 Include="Language\AngleBracketTemplateLexer.g3" />
-    <Compile Include="ITypeProxyFactory.cs" />
-    <Compile Include="JavaExtensions\AntlrJavaExtensions.cs" />
-    <Compile Include="JavaExtensions\DictionaryExtensions.cs" />
-    <Compile Include="JavaExtensions\ListExtensions.cs" />
-    <Compile Include="Language\AngleBracketTemplateLexerHelper.cs">
+    <Compile Update="Language\AngleBracketTemplateLexerHelper.cs">
       <DependentUpon>AngleBracketTemplateLexer.g3</DependentUpon>
     </Compile>
-    <Antlr3 Include="Language\Template.g3" />
-    <Compile Include="Language\ASTExpr.cs" />
-    <Compile Include="Language\Cat.cs" />
-    <Compile Include="Language\ChunkToken.cs" />
-    <Compile Include="Language\ConditionalExpr.cs" />
-    <Compile Include="Language\Expr.cs" />
-    <Compile Include="Language\FormalArgument.cs" />
-    <Compile Include="Language\NewlineRef.cs" />
-    <Compile Include="Language\RegionType.cs" />
-    <Compile Include="Language\StringRef.cs" />
-    <Compile Include="Language\StringTemplateAST.cs" />
-    <Compile Include="Language\StringTemplateToken.cs" />
-    <Compile Include="Language\StringTemplateTreeAdaptor.cs" />
-    <Compile Include="Language\TemplateLexerHelper.cs">
+    <Compile Update="Language\TemplateLexerHelper.cs">
       <DependentUpon>Template.g3</DependentUpon>
     </Compile>
-    <Compile Include="Language\TemplateParserHelper.cs">
+    <Compile Update="Language\TemplateParserHelper.cs">
       <DependentUpon>Template.g3</DependentUpon>
     </Compile>
-    <Antlr3 Include="Language\Interface.g3" />
-    <Compile Include="Language\InterfaceLexerHelper.cs">
+    <Compile Update="Language\InterfaceLexerHelper.cs">
       <DependentUpon>Interface.g3</DependentUpon>
     </Compile>
-    <Compile Include="Language\InterfaceParserHelper.cs">
+    <Compile Update="Language\InterfaceParserHelper.cs">
       <DependentUpon>Interface.g3</DependentUpon>
     </Compile>
-    <Antlr3 Include="Language\Group.g3" />
-    <Compile Include="Language\GroupLexerHelper.cs">
+    <Compile Update="Language\GroupLexerHelper.cs">
       <DependentUpon>Group.g3</DependentUpon>
     </Compile>
-    <Compile Include="Language\GroupParserHelper.cs">
+    <Compile Update="Language\GroupParserHelper.cs">
       <DependentUpon>Group.g3</DependentUpon>
     </Compile>
-    <Antlr3 Include="Language\Action.g3" />
-    <Compile Include="Language\ActionLexerHelper.cs">
+    <Compile Update="Language\ActionLexerHelper.cs">
       <DependentUpon>Action.g3</DependentUpon>
     </Compile>
-    <Compile Include="Language\ActionParserHelper.cs">
+    <Compile Update="Language\ActionParserHelper.cs">
       <DependentUpon>Action.g3</DependentUpon>
     </Compile>
-    <Antlr3 Include="Language\ActionEvaluator.g3" />
-    <Compile Include="Language\ActionEvaluatorHelper.cs">
+    <Compile Update="Language\ActionEvaluatorHelper.cs">
       <DependentUpon>ActionEvaluator.g3</DependentUpon>
     </Compile>
-    <Compile Include="TypeRegistry`1.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Reference\antlr3\runtime\CSharp3\Sources\Antlr3.Runtime\Antlr3.Runtime.csproj">
-      <Project>{8FDC0A87-9005-4D5A-AB75-E55CEB575559}</Project>
-      <Name>Antlr3.Runtime</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\..\keys\antlr\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <!-- Folder containing AntlrBuildTask.dll -->
-    <AntlrBuildTaskPath>$(ProjectDir)..\bin\Bootstrap</AntlrBuildTaskPath>
-    <!-- Path to the ANTLR Tool itself. -->
-    <AntlrToolPath>$(ProjectDir)..\bin\Bootstrap\Antlr3.exe</AntlrToolPath>
-  </PropertyGroup>
-  <Import Project="$(ProjectDir)..\bin\Bootstrap\Antlr3.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -35,6 +35,7 @@ namespace AntlrUnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
+    [TestCategory(TestCategories.SkipOnCI)]
     public class TestSemanticPredicateEvaluation : BaseTest
     {
         [TestMethod][TestCategory(TestCategories.Antlr3)]

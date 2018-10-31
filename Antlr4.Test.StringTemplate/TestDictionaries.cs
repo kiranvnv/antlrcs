@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2011 Terence Parr
  * All rights reserved.
@@ -37,6 +37,7 @@ namespace Antlr4.Test.StringTemplate
     using System.Collections.Generic;
     using Antlr4.StringTemplate.Misc;
     using Antlr4.Test.StringTemplate.Extensions;
+    using File = System.IO.File;
     using Path = System.IO.Path;
 
     [TestClass]
@@ -620,6 +621,108 @@ namespace Antlr4.Test.StringTemplate
             string expected = "-";
             string result = st.Render();
             Assert.AreEqual(expected, result);
+        }
+
+        /// <summary>
+        /// This is a regression test for antlr/stringtemplate4#114. Before the fix the following test would return
+        /// %hi%.
+        /// </summary>
+        /// <seealso href="https://github.com/antlr/stringtemplate4/issues/114">dictionary value using &lt;% %&gt; is broken</seealso>
+        [TestMethod]
+        [TestCategory(TestCategories.ST4)]
+        public void TestDictionaryBehaviorNoNewlineTemplate()
+        {
+            string templates =
+                "d ::= [\n" +
+                "	\"x\" : <%hi%>\n" +
+                "]\n" +
+                "\n" +
+                "t() ::= <<\n" +
+                "<d.x>\n" +
+                ">>\n";
+
+            writeFile(tmpdir, "t.stg", templates);
+            TemplateGroup group = new TemplateGroupFile(tmpdir + Path.DirectorySeparatorChar + "t.stg");
+            Template st = group.GetInstanceOf("t");
+            string expected = "hi";
+            string result = st.Render();
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.ST4)]
+        public void TestDictionarySpecialValues()
+        {
+            string templates = @"
+t(id) ::= <<
+<identifier.(id)>
+>>
+
+identifier ::= [
+    ""keyword"" : ""@keyword"",
+    default : key
+]
+";
+
+            writeFile(tmpdir, "t.stg", templates);
+            var group = new TemplateGroupFile(Path.Combine(tmpdir, "t.stg"));
+
+            // try with mapped values
+            var template = group.GetInstanceOf("t").Add("id", "keyword");
+            Assert.AreEqual("@keyword", template.Render());
+
+            // try with non-mapped values
+            template = group.GetInstanceOf("t").Add("id", "nonkeyword");
+            Assert.AreEqual("nonkeyword", template.Render());
+
+            // try with non-mapped values that might break (Substring here guarantees unique instances)
+            template = group.GetInstanceOf("t").Add("id", "_default".Substring(1));
+            Assert.AreEqual("default", template.Render());
+
+            template = group.GetInstanceOf("t").Add("id", "_keys".Substring(1));
+            Assert.AreEqual("keyworddefault", template.Render());
+
+            template = group.GetInstanceOf("t").Add("id", "_values".Substring(1));
+            Assert.AreEqual("@keywordkey", template.Render());
+        }
+
+        [TestMethod]
+        [TestCategory(TestCategories.ST4)]
+        public void TestDictionarySpecialValuesOverride()
+        {
+            string templates = @"
+t(id) ::= <<
+<identifier.(id)>
+>>
+
+identifier ::= [
+    ""keyword"" : ""@keyword"",
+    ""keys"" : ""keys"",
+    ""values"" : ""values"",
+    default : key
+]
+";
+
+            writeFile(tmpdir, "t.stg", templates);
+            var group = new TemplateGroupFile(Path.Combine(tmpdir, "t.stg"));
+
+            // try with mapped values
+            var template = group.GetInstanceOf("t").Add("id", "keyword");
+            Assert.AreEqual("@keyword", template.Render());
+
+            // try with non-mapped values
+            template = group.GetInstanceOf("t").Add("id", "nonkeyword");
+            Assert.AreEqual("nonkeyword", template.Render());
+
+            // try with non-mapped values that might break (Substring here guarantees unique instances)
+            template = group.GetInstanceOf("t").Add("id", "_default".Substring(1));
+            Assert.AreEqual("default", template.Render());
+
+            template = group.GetInstanceOf("t").Add("id", "_keys".Substring(1));
+            Assert.AreEqual("keys", template.Render());
+
+            template = group.GetInstanceOf("t").Add("id", "_values".Substring(1));
+            Assert.AreEqual("values", template.Render());
         }
     }
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -40,6 +40,7 @@ namespace AntlrUnitTests
     using Regex = System.Text.RegularExpressions.Regex;
 
     [TestClass]
+    [TestCategory(TestCategories.SkipOnCI)]
     public class TestCompositeGrammars : BaseTest
     {
         protected bool debug = false;

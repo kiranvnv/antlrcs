@@ -37,7 +37,7 @@ namespace Antlr3.Codegen
     using Antlr3.Analysis;
     using Antlr3.Extensions;
     using Antlr3.Grammars;
-#if DEBUG
+#if DEBUG && !NETSTANDARD
     using Antlr4.StringTemplate.Visualizer.Extensions;
 #endif
 
@@ -791,8 +791,8 @@ namespace Antlr3.Codegen
                 _target.GetTargetStringLiteralFromString( _grammar.FileName );
             outputFileST.SetAttribute( "fileName", targetAppropriateFileNameString );
             headerFileST.SetAttribute( "fileName", targetAppropriateFileNameString );
-            outputFileST.SetAttribute( "ANTLRVersion", AntlrTool.AssemblyVersion.ToString(4) );
-            headerFileST.SetAttribute( "ANTLRVersion", AntlrTool.AssemblyVersion.ToString(4) );
+            outputFileST.SetAttribute( "ANTLRVersion", AntlrTool.AssemblyInformationalVersion );
+            headerFileST.SetAttribute( "ANTLRVersion", AntlrTool.AssemblyInformationalVersion );
             outputFileST.SetAttribute( "generatedTimestamp", AntlrTool.GetCurrentTimeStamp() );
             headerFileST.SetAttribute( "generatedTimestamp", AntlrTool.GetCurrentTimeStamp() );
 
@@ -843,7 +843,7 @@ namespace Antlr3.Codegen
             if (ErrorManager.GetErrorState().errors > 0)
                 return null;
 
-#if DEBUG
+#if DEBUG && !NETSTANDARD
             if (CodeGenerator.LaunchTemplateInspector)
             {
                 outputFileST.Visualize();
@@ -1179,7 +1179,7 @@ namespace Antlr3.Codegen
         }
 
         /** For intervals such as [3..3, 30..35], generate an expression that
-         *  tests the lookahead similar to LA(1)==3 || (LA(1)>=30&&LA(1)<=35)
+         *  tests the lookahead similar to LA(1)==3 || (LA(1)>=30&amp;&amp;LA(1)&lt;=35)
          */
         public virtual StringTemplate GenSetExpr( TemplateGroup templates,
                                          IIntSet set,
@@ -1823,7 +1823,7 @@ namespace Antlr3.Codegen
         /** Create a label to track a token / rule reference's result.
          *  Technically, this is a place where I break model-view separation
          *  as I am creating a variable name that could be invalid in a
-         *  target language, however, label ::= <ID><INT> is probably ok in
+         *  target language, however, label ::= &lt;ID&gt;&lt;INT&gt; is probably ok in
          *  all languages we care about.
          */
         public virtual string CreateUniqueLabel( string name )

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -47,6 +47,7 @@ namespace AntlrUnitTests
      *  and basic functionality.
      */
     [TestClass]
+    [TestCategory(TestCategories.SkipOnCI)]
     public class TestTreeGrammarRewriteAST : BaseTest
     {
         protected bool debug = false;
